@@ -1,0 +1,42 @@
+version: "3.3"
+services:
+  traefik:
+    image: traefik
+    command:
+      - "--docker"								# Enable Docker backend
+      - "--docker.swarmmode"							# Use Docker on Swarm Mode
+      - "--docker.domain=cinosure.com"						# Default domain used
+      - "--docker.watch"							# Watch provider
+      - "--api"									# Enable api/dashboard
+      - "--entrypoints=Name:http Address::80 Redirect.EntryPoint:https"		# Entrypoints
+      - "--entrypoints=Name:https Address::443 TLS"				# Entrypoints
+      - "--defaultentrypoints=http,https"					# Entrypoints to be used by frontends
+      - "--acme"								# enable ACME automatic SSL
+      - "--acme.storage=/certificates/acme.json"				# Cert storage
+      - "--acme.entryPoint=https"						# Activate HTTP-01 challenge
+      - "--acme.httpChallenge.entryPoint=http"					# HTTP challenge EntryPoint
+      - "--acme.onHostRule=true"						# Cert gen on frontend rules
+      - "--acme.email=jon@whiteheat.org.uk"					# email used for registration
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - traefik-public-certificates:/certificates
+    networks:
+      - traefik-web
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    deploy:
+      placement:
+        constraints: [node.role==manager]
+      replicas: 1
+      labels:
+        - "traefik.frontend.rule=Host:traefik.cinosure.com"
+        - "traefik.enable=true"
+        - "traefik.port=8080"
+networks:
+  traefik-web:
+    external: true
+volumes:
+  traefik-public-certificates:
+    external: true
