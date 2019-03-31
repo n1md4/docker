@@ -1,0 +1,40 @@
+n1md4: i have portainer published on port 9000, but was not connected to traefik's user-defined network.  I connected portainer to traefik's network, but portainer has not been automatically discovered/displayed in traefik's dashboard.  is there another required configuration.
+(15:16:03) programmerq: n1md4▸ traefik needs to be configured to look for services with a label, iirc.
+(15:16:14) programmerq: does your portainer container have the label traefik is looking for?
+(15:19:07) n1md4: no, i've not configured labels.
+(15:19:13) n1md4: I know what you're talking about though.
+(15:19:33) n1md4: For some reason, I thought traefik did all this automatically.
+(15:20:38) n1md4: also, i don't know if this matters, but i can only see the traefik network on a single node; that's to say i can't connect containers on other nodes to the traefik network.
+(15:22:17) ada: n1md4: you have to assign a hostname label to your service, or else traefik will not know what HTTP requests to route to your container
+(15:22:33) ada: you assign a label to your services that you want Traefik to provide ingress for, and Traefik handles it after that
+(15:22:57) ada: https://docs.traefik.io/user-guide/swarm-mode/#deploy-your-apps
+(15:23:00) ada: look at the example there
+(15:23:01) n1md4: understood.
+(15:23:08) ada: you have to specify a hostname and a port for Traefik to route to
+(15:23:39) ada: that example might be a little tooo simple
+(15:24:14) n1md4: the traefik network i created "docker network create --driver=overlay traefik-public" created on node01, is that going to be a problem for containers on other nodes?
+(15:24:31) n1md4: the other nodes are part of the same swarm.
+(15:24:56) ada: https://termbin.com/3dsj
+(15:25:15) ada: what problem do you think that would create
+(15:25:16) n1md4: thatks.
+(15:25:23) ada: that's pretty much exactly how theyre intended to be used
+(15:25:34) ada: overlay networks tunnel the traffic between your Services across nodes
+(15:25:53) ada: so your containers can talk to each other as if they were in the same subnet regardless of where they are scheduled
+(15:25:55) n1md4: :thumbsup:
+(15:26:12) ada: note that the plain "docker run" containers can't attach to overlay networks by default
+(15:26:18) ada: only "docker service create"  Services
+(15:26:39) ada: but you can create one with the --attachable flag if you want "docker run --network my-overlay-net"  support
+(15:27:02) ada: so you said "containers" in your assertion, and technically, yes they won't be able to attach to this network
+(15:27:08) ada: because by default --attachable is not set
+(15:27:45) ada: but if you're deploying all swarm services, that is irrelevant
+(15:28:07) ada: I tend to stick to services pretty much at all times, unless I need a very very specific requirement that /services API doesn't handle yet
+(15:28:20) ada: like cap-add
+(15:29:33) n1md4: i'm still learning, as you can likely tell, and this is something i'm wanting to do.
+(15:29:58) n1md4: is it possible to add the labels to running containers?
+(15:30:48) ada: depends
+(15:30:53) ada: are they /containers or /services
+(15:31:22) ada: "docker update" is the only interface you have to update /containers, so that may let you add labels
+(15:31:45) ada: otherwise I'd create a service with the right labels
+(15:31:55) ada: services offer an update mechanism so you can change pretty much everything about them
+(15:32:39) n1md4: I've a collection of both, but covered all bases there.  Thanks to you both for assisting a newbie :)
+(15:32:48) ada: my quick check of docker update --help looksl ike you cannot add labels to a container

@@ -1,0 +1,67 @@
+version: "3.2"
+services:
+  flask:
+    image: clemenko/flask_demo
+    deploy:
+      replicas: 3
+      mode: replicated
+      labels:
+        - 'traefik.port=5000'
+        - 'traefik.frontend.rule=Host:flask.dockr.life'
+        - 'traefik.docker.network=traefik_inbound'
+        - 'traefik.backend.loadbalancer.sticky=true'
+      placement:
+        constraints:
+          - 'node.role == worker'
+    networks:
+      db:
+      kv:
+      traefik_inbound:
+    depends_on:
+      - mongo
+      - redis
+
+  whoami:
+    image: emilevauge/whoami
+    deploy:
+      replicas: 3
+      mode: replicated
+      labels:
+        - 'traefik.port=80'
+        - 'traefik.frontend.rule=Host:app.dockr.life; PathPrefixStrip: /whoami/'
+      placement:
+        constraints:
+          - 'node.role == worker'
+    networks:
+      traefik_inbound:
+
+  visualizer:
+    image: dockersamples/visualizer
+    deploy:
+      placement:
+        constraints:
+          - 'node.role == manager'
+      labels:
+        - 'traefik.port=8080'
+        - 'traefik.frontend.rule=Host:app.dockr.life; PathPrefixStrip: /viz/'
+    networks:
+      traefik_inbound:
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  mongo:
+    image: mongo
+    networks:
+      db:
+
+  redis:
+    image: redis:alpine
+    networks:
+      kv:
+
+networks:
+  kv:
+  db:
+  traefik_inbound:
+    external: true
+

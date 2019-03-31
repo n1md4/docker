@@ -1,0 +1,15 @@
+version: '3'
+services:
+  openvpn:
+    deploy:
+      placement:
+        constraints:
+          - node.id == nfdteyfqrm1y9gowzb4no0ozf
+    cap_add:
+     - NET_ADMIN
+    image: kylemanna/openvpn
+    ports:
+     - "1194:1194/udp"
+    restart: always
+    volumes:
+     - /docker/openvpn:/etc/openvpn
