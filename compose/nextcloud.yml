@@ -20,7 +20,6 @@ services:
   app:
     image: nextcloud
     ports:
-      - 9090:80
     links:
       - db
     volumes:
