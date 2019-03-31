@@ -6,7 +6,7 @@ services:
     image: ghost:1-alpine
     restart: always
     ports:
-      - 7070:2368
+      - 2368
     environment:
       # see https://docs.ghost.org/docs/config#section-running-ghost-with-config-env-variables
       database__client: mysql
@@ -31,6 +31,10 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: oosh0phe3xaep2AhZ8Xoo6th
+    networks:
+      - ghost-net
+    volumes:
+      - db:/var/lib/mysql
 
 networks:
   traefik-web:
