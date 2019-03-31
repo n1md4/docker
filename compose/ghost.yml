@@ -5,8 +5,6 @@ services:
   ghost:
     image: ghost:1-alpine
     restart: always
-    ports:
-      - 2368
     environment:
       # see https://docs.ghost.org/docs/config#section-running-ghost-with-config-env-variables
       database__client: mysql
@@ -16,7 +14,7 @@ services:
       database__connection__database: ghost
     deploy:
       labels:
-        - "traefik.docker.network = raefik-web"
+        - "traefik.docker.network = traefik-web"
         - "traefik.frontend.rule = Host:ghost.cinosure.com"
         - "traefik.port = 2368"
     volumes:
@@ -40,6 +38,7 @@ networks:
   traefik-web:
     external: true
   ghost-net:
+    driver: overlay
     external: false
 
 volumes:
