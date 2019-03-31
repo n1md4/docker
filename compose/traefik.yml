@@ -1,51 +1,42 @@
-version: "3"
+version: "3.3"
 services:
   traefik:
-    image: traefik:1.7
+    image: traefik
     command:
-      - "--api"
-      - "--entrypoints=Name:http Address::80 Redirect.EntryPoint:https"
-      - "--entrypoints=Name:https Address::443 TLS"
-      - "--defaultentrypoints=http,https"
-      - "--acme"
-      - "--acme.storage=/certificates/acme.json"
-      - "--acme.entryPoint=https"
-      - "--acme.httpChallenge.entryPoint=http"
-      - "--acme.onHostRule=true"
-      - "--acme.onDemand=false"
-      - "--acme.email=jon@whiteheat.org.uk"
-      - "--docker"
-      - "--docker.swarmMode"
-      - "--docker.domain=cinosure.com"
-      - "--docker.watch"
-    labels:
-      - "traefik.frontend.rule=Host:traefik.cinosure.com"
-      - "traefik.enable=true"
-      - "traefik.port=8080"
+      - "--docker"								# Enable Docker backend
+      - "--docker.swarmmode"							# Use Docker on Swarm Mode
+      - "--docker.domain=cinosure.com"						# Default domain used
+      - "--docker.watch"							# Watch provider
+      - "--api"									# Enable api/dashboard
+      - "--entrypoints=Name:http Address::80 Redirect.EntryPoint:https"		# Entrypoints
+      - "--entrypoints=Name:https Address::443 TLS"				# Entrypoints
+      - "--defaultentrypoints=http,https"					# Entrypoints to be used by frontends
+      - "--acme"								# enable ACME automatic SSL
+      - "--acme.storage=/certificates/acme.json"				# Cert storage
+      - "--acme.entryPoint=https"						# Activate HTTP-01 challenge
+      - "--acme.httpChallenge.entryPoint=http"					# HTTP challenge EntryPoint
+      - "--acme.onHostRule=true"						# Cert gen on frontend rules
+      - "--acme.email=jon@whiteheat.org.uk"					# email used for registration
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - traefik-public-certificates:/certificates
     networks:
       - traefik-web
     ports:
-      - 80:80
-      - 443:443
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
     deploy:
-      mode: global
       placement:
-        constraints:
-          - node.role == manager
-          - node.labels.traefik-public.traefik-public-certificates==true
-          - tage==traefik-public
-      update_config:
-        parallelism: 1
-        delay: 10s
-      restart_policy:
-        condition: on-failure
+        constraints: [node.role==manager]
+      replicas: 1
+      labels:
+        - "traefik.frontend.rule=Host:traefik.cinosure.com"
+        - "traefik.enable=true"
+        - "traefik.port=8080"
 networks:
   traefik-web:
-    driver: overlay
     external: true
-
 volumes:
   traefik-public-certificates:
+    external: true
