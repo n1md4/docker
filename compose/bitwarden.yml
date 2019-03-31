@@ -1,0 +1,24 @@
+version: '3'
+services:
+  password:
+    image: mprasil/bitwarden:latest
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      labels:
+        - "traefik.docker.network=traefik-web"
+        - "traefik.frontend.rule=Host:bitwarden.cinosure.com"
+        - "traefik.port=8888"
+    networks:
+      - traefik-web
+    ports:
+      - "8888:80"
+    volumes:
+      - bw-data:/data
+volumes:
+  bw-data:
+    external: true
+networks:
+  traefik-web:
+    external: true
