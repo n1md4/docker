@@ -14,9 +14,9 @@ services:
       database__connection__database: ghost
     deploy:
       labels:
-        - "traefik.docker.network = traefik-web"
-        - "traefik.frontend.rule = Host:ghost.cinosure.com"
-        - "traefik.port = 2368"
+        - "traefik.docker.network=traefik-web"
+        - "traefik.frontend.rule=Host:ghost.cinosure.com"
+        - "traefik.port=2368"
     volumes:
       - ghost:/var/lib/ghost/content
 
