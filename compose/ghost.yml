@@ -12,6 +12,7 @@ services:
       database__connection__user: root
       database__connection__password: oosh0phe3xaep2AhZ8Xoo6th
       database__connection__database: ghost
+      url: ghost.cinosure.com
     deploy:
       labels:
         - "traefik.docker.network=traefik-web"
