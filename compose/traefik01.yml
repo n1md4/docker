@@ -1,0 +1,51 @@
+version: "3"
+services:
+  traefik:
+    image: traefik:1.7
+    command:
+      - "--api"
+      - "--entrypoints=Name:http Address::80 Redirect.EntryPoint:https"
+      - "--entrypoints=Name:https Address::443 TLS"
+      - "--defaultentrypoints=http,https"
+      - "--acme"
+      - "--acme.storage=/certificates/acme.json"
+      - "--acme.entryPoint=https"
+      - "--acme.httpChallenge.entryPoint=http"
+      - "--acme.onHostRule=true"
+      - "--acme.onDemand=false"
+      - "--acme.email=jon@whiteheat.org.uk"
+      - "--docker"
+      - "--docker.swarmMode"
+      - "--docker.domain=cinosure.com"
+      - "--docker.watch"
+    labels:
+      - "traefik.frontend.rule=Host:traefik.cinosure.com"
+      - "traefik.enable=true"
+      - "traefik.port=8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - traefik-public-certificates:/certificates
+    networks:
+      - traefik-web
+    ports:
+      - 80:80
+      - 443:443
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - node.role == manager
+          - node.labels.traefik-public.traefik-public-certificates==true
+          - tage==traefik-public
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+networks:
+  traefik-web:
+    driver: overlay
+    external: true
+
+volumes:
+  traefik-public-certificates:
