@@ -1,0 +1,17 @@
+version: '3'
+services:
+  nfs-server-alpine:
+    image: itsthenetwork/nfs-server-alpine:latest
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.id == rancheros03]
+    networks:
+      - nfs-storage
+    volumes:
+      - /media/rancher/docker/fileshare:/export
+    privileged: true
+networks:
+  nfs-storage:
