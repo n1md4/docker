@@ -36,12 +36,12 @@ services:
         - "traefik.basic.frontend.rule=Host:portainer.cinosure.com"
         - "traefik.basic.port=9000"
         - "traefik.basic.protocol=http"
-   
+
 networks:
   agent_network:
     driver: overlay
     attachable: true
-  traefik-public:
+  traefik-web:
     external: true
 
 volumes:
