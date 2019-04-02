@@ -7,7 +7,7 @@ services:
       restart_policy:
         condition: on-failure
       placement:
-        constraints: [node==rancheros03]
+        constraints: [node.hostname==rancheros03]
     networks:
       - nfs-storage
     volumes:
