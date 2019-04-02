@@ -10,6 +10,8 @@ services:
         constraints: [node.hostname==rancheros03]
     networks:
       - nfs-storage
+    ports:
+      - "2049:2049"
     volumes:
       - /media/rancher/docker/fileshare:/export
     privileged: true
