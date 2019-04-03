@@ -11,6 +11,8 @@ services:
       MYSQL_DATABASE: wordpress
       MYSQL_USER: wordpress
       MYSQL_PASSWORD: iePhai3eeg3Oophu6hi5zo0U
+    networks:
+      - wordpress-net
 
   wordpress:
     depends_on:
@@ -28,5 +30,9 @@ services:
         - "traefik.frontend.rule=Host:wordpress.cinosure.com"
         - "traefik.enable=true"
         - "traefik.port=80"
+    networks:
+      - wordpress-net
 volumes:
-    db_data:
+  db_data:
+networks:
+  wordpress-net:
