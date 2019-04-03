@@ -1,0 +1,1 @@
+docker run -d --name nfs --privileged -v /media/rancher/docker/fileshare:/nfsshare -e SHARED_DIRECTORY=/nfsshare -p 2049:2049 itsthenetwork/nfs-server-alpine:latest

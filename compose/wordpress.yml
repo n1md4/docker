@@ -1,0 +1,32 @@
+version: '3.3'
+
+services:
+  db:
+    image: mysql:5.7
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: oxoo4Eeziecasae9cheewax7
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: iePhai3eeg3Oophu6hi5zo0U
+
+  wordpress:
+    depends_on:
+      - db
+    image: wordpress:latest
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: iePhai3eeg3Oophu6hi5zo0U
+      WORDPRESS_DB_NAME: wordpress
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.frontend.rule=Host:wordpress.cinosure.com"
+        - "traefik.enable=true"
+        - "traefik.port=80"
+volumes:
+    db_data:
