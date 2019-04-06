@@ -1,0 +1,21 @@
+version: '3'
+services:
+  nfs-ganesha:
+    image: apnar/nfs-ganesha
+    environment:
+      - GANESHA_EXPORT=/export
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints: [node.hostname==rancheros03]
+    networks:
+      - nfs-storage
+    ports:
+      - "2049:2049"
+    volumes:
+      - /media/rancher/docker/fileshare:/export
+    privileged: true
+networks:
+  nfs-storage:
