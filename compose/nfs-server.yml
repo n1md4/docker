@@ -3,7 +3,7 @@ services:
   nfs-server-alpine:
     image: itsthenetwork/nfs-server-alpine:latest
     environment:
-      - SHARED_DIRECTORY=/export
+      - SHARED_DIRECTORY=/
     deploy:
       replicas: 1
       restart_policy:
