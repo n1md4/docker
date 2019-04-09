@@ -1,0 +1,19 @@
+version: '3.2'
+# service configuration
+services:
+  web-server:
+    image: nginx:latest
+    volumes:
+      - type: volume
+        source: nfs-mount
+        target: "/data"
+        volume:
+          nocopy: true
+          
+# volumes configuration at the end of compose file
+volumes:
+  nfs-mount:
+    driver_opts:
+      type: "nfs"
+      o: "addr=10.0.0.150,nolock,soft,rw"
+      device: ":/"
